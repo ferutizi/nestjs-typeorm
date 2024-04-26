@@ -6,10 +6,26 @@ import { CreateUserDto } from './dto/create-user.dto';
 export class UsersService {
   constructor(
     @InjectRepository(User) private userRepository: Repository<User>,
-  ) {}
+  ) { }
 
-  createSecureServer(user: CreateUserDto) {
+  createUser(user: CreateUserDto) {
     const newUser = this.userRepository.create(user);
     return this.userRepository.save(newUser);
+  }
+
+  getUsers() {
+    return this.userRepository.find()
+  }
+
+  getUser(id: number) {
+    return this.userRepository.findOne({
+      where: {
+        id: id
+      }
+    })
+  }
+
+  deleteUser(id: number) {
+    return this.userRepository.delete({ id })
   }
 }
