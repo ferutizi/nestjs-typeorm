@@ -74,13 +74,16 @@ export class UsersService {
 
   async createProfile(id: number, profile: CreateProfileDto) {
     const userFound = await this.userRepository.findOne({
-      where: {
-        id
-      }
-    })
+      where: { id },
+      relations: ["profile"]
+    });
 
-    if(!userFound) {
-      return new HttpException('Usuario no encontrado', HttpStatus.NOT_FOUND)
+    if (!userFound) {
+      throw new HttpException('Usuario no encontrado', HttpStatus.NOT_FOUND);
+    }
+
+    if (userFound.profile) {
+      throw new HttpException('El usuario ya tiene un perfil', HttpStatus.CONFLICT);
     }
 
     const newProfile = this.profileRepository.create(profile)
