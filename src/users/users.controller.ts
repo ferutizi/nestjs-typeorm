@@ -2,11 +2,12 @@ import { Body, Controller, Delete, Get, Param, ParseIntPipe, Patch, Post } from 
 import { CreateUserDto } from './dto/create-user.dto';
 import { UsersService } from './users.service';
 import { User } from './user.entity';
-import { DeleteResult } from 'typeorm';
 import { UpdateUserDto } from './dto/update-user.dto';
+import { CreateProfileDto } from './dto/create-profile.dto';
 
 @Controller('users')
 export class UsersController {
+  // eslint-disable-next-line prettier/prettier
   constructor(private userService: UsersService) { }
 
   @Get()
@@ -25,12 +26,20 @@ export class UsersController {
   }
 
   @Delete(':id')
-  deleteUser(@Param('id', ParseIntPipe) id: number): Promise<DeleteResult> {
+  deleteUser(@Param('id', ParseIntPipe) id: number) {
     return this.userService.deleteUser(id)
   }
 
   @Patch(':id')
   updateUser(@Param('id', ParseIntPipe) id: number, @Body() user: UpdateUserDto) {
     return this.userService.updateUser(id, user)
+  }
+
+  @Post(':id/profile')
+  createProfile(
+    @Param('id', ParseIntPipe) id: number,
+    @Body() profile: CreateProfileDto
+  ) {
+    return this.userService.createProfile(id, profile)
   }
 }

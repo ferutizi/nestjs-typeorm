@@ -4,10 +4,14 @@ import { Repository } from 'typeorm';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { HttpException, HttpStatus } from '@nestjs/common';
+import { CreateProfileDto } from './dto/create-profile.dto';
+import { Profile } from './profile.entity';
 
 export class UsersService {
   constructor(
+    // eslint-disable-next-line prettier/prettier
     @InjectRepository(User) private userRepository: Repository<User>,
+    @InjectRepository(Profile) private profileRepository: Repository<Profile>,
   ) { }
 
   async createUser(user: CreateUserDto) {
@@ -66,5 +70,23 @@ export class UsersService {
 
     const updateUser = Object.assign(userFound, user)
     return this.userRepository.save(updateUser)
+  }
+
+  async createProfile(id: number, profile: CreateProfileDto) {
+    const userFound = await this.userRepository.findOne({
+      where: {
+        id
+      }
+    })
+
+    if(!userFound) {
+      return new HttpException('Usuario no encontrado', HttpStatus.NOT_FOUND)
+    }
+
+    const newProfile = this.profileRepository.create(profile)
+    const savedProfile = await this.profileRepository.save(newProfile)
+    userFound.profile = savedProfile
+
+    return this.userRepository.save(userFound)
   }
 }
